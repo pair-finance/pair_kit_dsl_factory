@@ -12,6 +12,11 @@ Gem::Specification.new do |spec|
   spec.platform              = Gem::Platform::RUBY
   spec.required_ruby_version = '>= 2.5.0'
 
+  spec.metadata['homepage_uri']           = spec.homepage
+  spec.metadata['source_code_uri']        = spec.homepage
+  spec.metadata['changelog_uri']          = "#{spec.homepage}/blob/main/CHANGELOG.md"
+  # spec.metadata['rubygems_mfa_required']  = 'true'
+
   spec.files = Dir['README.md', 'LICENSE',
                    'CHANGELOG.md', 'lib/**/*.rb',
                    'lib/**/*.rake',
