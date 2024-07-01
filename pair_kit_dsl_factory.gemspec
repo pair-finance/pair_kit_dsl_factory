@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.4'
+  spec.add_development_dependency 'rspec-rails', '~> 3.4', '>= 3.4.2'
 
   spec.add_development_dependency 'simplecov', '~> 0.19'
   spec.add_development_dependency 'simplecov-cobertura', '~> 2.1'
