@@ -101,7 +101,7 @@ class ApplicationModel < ActiveRecord::Model
   
   def self.draw_schema(&block)
     self.json_schema = {}
-    JSON_SCHEMA_BUILDER.build(:schema, json_schema).struct(&block)
+    JSON_SCHEMA_BUILDER.build(json_schema).struct(&block)
   end
 end
 

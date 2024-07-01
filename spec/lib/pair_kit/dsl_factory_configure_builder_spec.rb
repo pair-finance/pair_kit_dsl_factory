@@ -10,7 +10,7 @@ end
 
 describe PairKit::DslFactory do
   describe '#configure_builder' do
-    subject { factory.build(:foo, {}) }
+    subject { factory.build({}) }
 
     let(:factory) { described_class.new }
 

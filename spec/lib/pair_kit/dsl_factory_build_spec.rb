@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'irb'
 
 
 module SchemaConcernDsl
@@ -8,14 +7,14 @@ module SchemaConcernDsl
     _schema[:properties] = {}
     _schema[:required] = []
 
-    build(:struct, _schema, &block)
+    build(_schema, :struct, &block)
   end
 
   def array(&block)
     _schema[:type] = :array
     _schema[:item] ||= {}
 
-    build(:array, _schema, &block)
+    build(_schema, :array, &block)
   end
 
   def number
@@ -40,7 +39,7 @@ module StructDsl
     name = name.to_sym
     subject[:properties][name] = {}
 
-    build(:property, subject, name: name, &block)
+    build(subject, :property, name: name, &block)
   end
 end
 
@@ -48,7 +47,7 @@ module ArrayDsl
   include SchemaConcernDsl
 
   def item(&block)
-    build(:schema, subject[:item], &block)
+    build(subject[:item], &block)
   end
 
   def _schema
@@ -88,7 +87,7 @@ describe PairKit::DslFactory do
 
     context 'when simple struct defined' do
       before do
-        factory.build(:schema, schema) do
+        factory.build(schema) do
           struct do
             prop(:first_name).required.string
             prop(:last_name).required.string
@@ -114,7 +113,7 @@ describe PairKit::DslFactory do
 
     context 'when struct in array defined' do
       before do
-        factory.build(:schema, schema).array.struct do
+        factory.build(schema).array.struct do
           prop(:first_name).required.string
           prop(:last_name).required.string
           prop(:balance).required.number
@@ -141,7 +140,7 @@ describe PairKit::DslFactory do
 
     context 'when struct with array of string defined' do
       before do
-        factory.build(:schema, schema).struct do
+        factory.build(schema).struct do
           prop(:tags).required.array.string
         end
       end
