@@ -1,4 +1,5 @@
 require 'rake'
+require 'debug'
 
 begin
   require 'bundler/setup'

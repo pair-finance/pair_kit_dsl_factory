@@ -11,8 +11,11 @@ module PairKit
       instance_exec(&block) if block
     end
 
-    def configure_builder(name, &block)
-      (@builders[name.to_sym] ||= Class.new(Builder)).class_exec(&block)
+    def configure_builder(name, *modules, &block)
+      (@builders[name.to_sym] ||= Class.new(Builder))
+        .tap { |builder| modules.flatten.each { |mod| builder.class_exec { include mod }}}
+        .tap { |builder| builder.class_exec(&block) if block }
+
       @default_builder = @builders.keys.first if @builders.size == 1
       self
     end

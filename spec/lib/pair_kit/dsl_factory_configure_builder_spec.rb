@@ -69,5 +69,36 @@ describe PairKit::DslFactory do
       it { is_expected.to respond_to(:world) }
       it { is_expected.to respond_to(:world2) }
     end
+
+    context 'when two modules passed as params' do
+      before do
+        factory.configure_builder(:foo, World, World2)
+      end
+
+      it { is_expected.to respond_to(:world) }
+      it { is_expected.to respond_to(:world2) }
+    end
+
+    context 'when one module passed, another included and method defined' do
+      before do
+        factory.configure_builder(:foo, World) do
+          include World2
+          def hello; end
+        end
+      end
+
+      it { is_expected.to respond_to(:world) }
+      it { is_expected.to respond_to(:world2) }
+      it { is_expected.to respond_to(:hello) }
+    end
+
+    context 'when two modules passed in a deep array' do
+      before do
+        factory.configure_builder(:foo, [World, [World2]])
+      end
+
+      it { is_expected.to respond_to(:world) }
+      it { is_expected.to respond_to(:world2) }
+    end
   end
 end
