@@ -1,7 +1,7 @@
 require File.expand_path('lib/pair_kit/dsl_factory/version', __dir__)
 
 Gem::Specification.new do |spec|
-  spec.name                  = 'pair_kit_dsl_factory'
+  spec.name                  = 'pair-kit-dsl-factory'
   spec.version               = PairKit::DslFactory::VERSION
   spec.authors               = ['Dmitry Sharkov']
   spec.email                 = %w(dmitry.sharkov@gmail.com dmitry.sharkov@pairfinance.com)
@@ -25,8 +25,8 @@ Gem::Specification.new do |spec|
 
   spec.extra_rdoc_files = ['README.md']
 
-  spec.add_development_dependency 'pry-byebug'
-  spec.add_development_dependency 'pry-alias'
+  spec.add_development_dependency 'pry-byebug', '~> 0.13'
+  spec.add_development_dependency 'pry-alias', '>= 0.0.1'
 
   spec.add_development_dependency 'rubocop', '~> 1.64'
   spec.add_development_dependency 'rubocop-performance', '~> 1.20'
