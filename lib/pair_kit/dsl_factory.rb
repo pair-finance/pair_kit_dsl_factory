@@ -4,7 +4,7 @@ module PairKit
     require_relative 'dsl_factory/builder'
     require_relative 'dsl_factory/wrapper'
 
-    attr_reader :builders, :default_builder
+    attr_reader :builders
 
     def initialize(&block)
       @builders = {}
@@ -21,19 +21,27 @@ module PairKit
     end
 
     def build(thing, **options, &block)
-      builder_name = options[:builder] || @default_builder
+      call(thing, **options, &block)
+      thing
+    end
+
+    def call(thing, **options, &block)
+      builder_name = (options[:builder] = options[:builder]&.to_sym || default_builder)
+
       builder_class = builders[builder_name] || raise("Unknown builder #{builder_name}")
 
       Wrapper.new(builder_name, builder_class.new(self, thing, **options))
              .tap { |x| x.instance_exec(&block) if block }
     end
 
+    def default_builder
+      builders.keys.first
+    end
+
     def branch(&block)
       self.class.new
           .tap { |x| builders.each { |k, v| x.builders[k] = Class.new(v) } }
-          .tap { |x| x.default_builder = default_builder }
           .tap { |x| x.instance_exec(&block) if block }
-
     end
 
     protected

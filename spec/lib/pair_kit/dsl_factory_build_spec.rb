@@ -2,10 +2,7 @@ require 'spec_helper'
 
 describe PairKit::DslFactory do
   describe '#build' do
-    subject { schema }
-
     let(:factory) { described_class.new }
-    let(:schema) { {} }
 
     let(:schema_concern_dsl) {
       Module.new do
@@ -14,14 +11,14 @@ describe PairKit::DslFactory do
           _schema[:properties] = {}
           _schema[:required] = []
 
-          build(_schema, builder: :struct, &block)
+          @dsl.(_schema, builder: :struct, &block)
         end
 
         def array(&block)
           _schema[:type] = :array
           _schema[:item] ||= {}
 
-          build(_schema, builder: :array, &block)
+          @dsl.(_schema, builder: :array, &block)
         end
 
         def number
@@ -39,47 +36,47 @@ describe PairKit::DslFactory do
         private
 
         def _schema
-          subject
+          @subject
         end
       end
 
       factory.configure_builder(:struct, schema_concern_dsl) do
         def prop(name, &block)
           name = name.to_sym
-          subject[:properties][name] = {}
+          @subject[:properties][name] = {}
 
-          build(subject, builder: :property, name: name, &block)
+          @dsl.(@subject, builder: :property, name: name, &block)
         end
       end
 
       factory.configure_builder(:array, schema_concern_dsl) do
         def item(&block)
-          build(subject[:item], &block)
+          build(@subject[:item], &block)
         end
 
         private
 
         def _schema
-          subject[:item]
+          @subject[:item]
         end
       end
 
       factory.configure_builder(:property, schema_concern_dsl) do
         def required
-          (subject[:required] ||= []) << options[:name]
+          (@subject[:required] ||= []) << @options[:name]
         end
 
         private
 
         def _schema
-          subject[:properties][options[:name]]
+          @subject[:properties][@options[:name]]
         end
       end
     end
 
     context 'when simple struct defined' do
-      before do
-        factory.build(schema) do
+      subject do
+        factory.build({}) do
           struct do
             prop(:first_name).required.string
             prop(:last_name).required.string
@@ -104,11 +101,14 @@ describe PairKit::DslFactory do
     end
 
     context 'when struct in array defined' do
-      before do
-        factory.build(schema).array.struct do
-          prop(:first_name).required.string
-          prop(:last_name).required.string
-          prop(:balance).required.number
+
+      subject do
+        factory.build({}) do
+          array.struct do
+            prop(:first_name).required.string
+            prop(:last_name).required.string
+            prop(:balance).required.number
+          end
         end
       end
 
@@ -131,11 +131,7 @@ describe PairKit::DslFactory do
     end
 
     context 'when struct with array of string defined' do
-      before do
-        factory.build(schema).struct do
-          prop(:tags).required.array.string
-        end
-      end
+      subject { factory.build({}) { struct { prop(:tags).required.array.string } } }
 
       let(:result) do
         {

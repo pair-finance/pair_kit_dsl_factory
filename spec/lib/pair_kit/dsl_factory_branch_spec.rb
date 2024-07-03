@@ -6,8 +6,8 @@ describe PairKit::DslFactory do
     context 'when two methods defined for the same builder' do
       let(:paren_factory) { described_class.new { configure_builder(:foo) { def hello; end } } }
       let(:child_factory) { paren_factory.branch { configure_builder(:foo) { def world; end } } }
-      let(:parent_builder) { paren_factory.build({}) }
-      let(:child_builder) { child_factory.build({}) }
+      let(:parent_builder) { paren_factory.call({}) }
+      let(:child_builder) { child_factory.call({}) }
 
       it { expect(paren_factory.default_builder).to eq :foo }
       it { expect(parent_builder).to respond_to(:hello) }

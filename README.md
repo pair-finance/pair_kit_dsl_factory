@@ -71,41 +71,40 @@ class ApplicationModel < ActiveRecord::Model
       private
       
       def _schema
-        subject
+        @subject
       end
     end
     
     configure_builder(:struct, SchemaDsl) do
       def prop(name, &block)
         name = name.to_sym
-        subject[:properties][name] = {}
+        @subject[:properties][name] = {}
 
-        build(subject, builder: :property, name: name, &block)
+        @dsl.(@subject, builder: :property, name: name, &block)
       end
     end
     
     configure_builder(:array, SchemaDsl) do
       def item(&block)
-        build(subject[:item], builder: :schema &block)
+        @dsl.(@subject[:item], builder: :schema &block)
       end
 
       private
 
       def _schema
-        subject[:item]
+        @subject[:item]
       end
     end
     
     configure_builder(:property, SchemaDsl) do
-
       def required
-        (subject[:required] ||= []) << options[:name]
+        (@subject[:required] ||= []) << @options[:name]
       end
 
       private
 
       def _schema
-        subject[:properties][options[:name]]
+        @subject[:properties][@options[:name]]
       end
     end
   end
@@ -113,8 +112,8 @@ class ApplicationModel < ActiveRecord::Model
   class_attribute :json_schema 
   
   def self.draw_schema(&block)
-    self.json_schema = {}
-    JSON_SCHEMA_BUILDER.build(json_schema).struct(&block)
+    self.json_schema ||= {}
+    JSON_SCHEMA_BUILDER.builder(json_schema).struct(&block)
   end
 end
 
