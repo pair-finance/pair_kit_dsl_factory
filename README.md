@@ -9,6 +9,24 @@ More documentation coming soon.
 
 ---
 
+## Usage 
+   
+In your gemfile 
+
+```ruby
+
+gem 'pair-kit-dsl-factory'
+
+```
+
+In your code 
+
+```ruby
+
+require 'pair_kit/dsl_factory'
+
+```
+
 
 ## Example
 
@@ -17,7 +35,7 @@ This example show how to build simple JSON Schema DSL.
 ### Step 1: Define your DSL parts as modules  
 
 ```ruby
-module SchemaConcernDsl
+module SchemaDsl
   def struct(&block)
     _schema[:type] = :object
     _schema[:properties] = {}
@@ -42,48 +60,6 @@ module SchemaConcernDsl
   end
 end
 
-module SchemaDsl
-  include SchemaConcernDsl
-
-  def _schema
-    subject
-  end
-end
-
-module StructDsl
-  def prop(name, &block)
-    name = name.to_sym
-    subject[:properties][name] = {}
-
-    build(:property, subject, name: name, &block)
-  end
-end
-
-module ArrayDsl
-  include SchemaConcernDsl
-
-  def item(&block)
-    build(:schema, subject[:item], &block)
-  end
-
-  def _schema
-    subject[:item]
-  end
-end
-
-module PropertyDsl
-  include SchemaConcernDsl
-
-  def required
-    (subject[:required] ||= []) << options[:name]
-  end
-
-  private
-
-  def _schema
-    subject[:properties][options[:name]]
-  end
-end
 ```
 
 ### Step 2: Configure your factory
@@ -91,10 +67,47 @@ end
 ```ruby
 class ApplicationModel < ActiveRecord::Model
   JSON_SCHEMA_BUILDER = DslFactory.new do
-    configure_builder(:schema) { include SchemaDsl }
-    configure_builder(:struct) { include StructDsl }
-    configure_builder(:array) { include ArrayDsl }
-    configure_builder(:property) { include PropertyDsl }
+    configure_builder(:schema, SchemaDsl) do
+      private
+      
+      def _schema
+        subject
+      end
+    end
+    
+    configure_builder(:struct, SchemaDsl) do
+      def prop(name, &block)
+        name = name.to_sym
+        subject[:properties][name] = {}
+
+        build(subject, builder: :property, name: name, &block)
+      end
+    end
+    
+    configure_builder(:array, SchemaDsl) do
+      def item(&block)
+        build(subject[:item], builder: :schema &block)
+      end
+
+      private
+
+      def _schema
+        subject[:item]
+      end
+    end
+    
+    configure_builder(:property, SchemaDsl) do
+
+      def required
+        (subject[:required] ||= []) << options[:name]
+      end
+
+      private
+
+      def _schema
+        subject[:properties][options[:name]]
+      end
+    end
   end
   
   class_attribute :json_schema 

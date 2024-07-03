@@ -11,8 +11,8 @@ module PairKit
 
       attr_accessor :subject, :factory, :options
 
-      def build(new_thing, builder_name = nil, **options, &block)
-        factory.build(new_thing, builder_name, **options, &block)
+      def build(new_thing, **options, &block)
+        factory.build(new_thing, **options, &block)
       end
     end
   end

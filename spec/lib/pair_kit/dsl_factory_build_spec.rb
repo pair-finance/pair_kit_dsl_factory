@@ -1,76 +1,5 @@
 require 'spec_helper'
 
-
-module SchemaConcernDsl
-  def struct(&block)
-    _schema[:type] = :object
-    _schema[:properties] = {}
-    _schema[:required] = []
-
-    build(_schema, :struct, &block)
-  end
-
-  def array(&block)
-    _schema[:type] = :array
-    _schema[:item] ||= {}
-
-    build(_schema, :array, &block)
-  end
-
-  def number
-    _schema[:type] = :number
-  end
-
-  def string
-    _schema[:type] = :string
-  end
-end
-
-module SchemaDsl
-  include SchemaConcernDsl
-
-  def _schema
-    subject
-  end
-end
-
-module StructDsl
-  def prop(name, &block)
-    name = name.to_sym
-    subject[:properties][name] = {}
-
-    build(subject, :property, name: name, &block)
-  end
-end
-
-module ArrayDsl
-  include SchemaConcernDsl
-
-  def item(&block)
-    build(subject[:item], &block)
-  end
-
-  def _schema
-    subject[:item]
-  end
-end
-
-module PropertyDsl
-  include SchemaConcernDsl
-
-  def required
-    (subject[:required] ||= []) << options[:name]
-  end
-
-  private
-
-  def _schema
-    subject[:properties][options[:name]]
-  end
-end
-
-
-
 describe PairKit::DslFactory do
   describe '#build' do
     subject { schema }
@@ -78,11 +7,74 @@ describe PairKit::DslFactory do
     let(:factory) { described_class.new }
     let(:schema) { {} }
 
+    let(:schema_concern_dsl) {
+      Module.new do
+        def struct(&block)
+          _schema[:type] = :object
+          _schema[:properties] = {}
+          _schema[:required] = []
+
+          build(_schema, builder: :struct, &block)
+        end
+
+        def array(&block)
+          _schema[:type] = :array
+          _schema[:item] ||= {}
+
+          build(_schema, builder: :array, &block)
+        end
+
+        def number
+          _schema[:type] = :number
+        end
+
+        def string
+          _schema[:type] = :string
+        end
+      end
+    }
+
     before do
-      factory.configure_builder(:schema) { include SchemaDsl }
-      factory.configure_builder(:struct) { include StructDsl }
-      factory.configure_builder(:array) { include ArrayDsl }
-      factory.configure_builder(:property) { include PropertyDsl }
+      factory.configure_builder(:schema, schema_concern_dsl) do
+        private
+
+        def _schema
+          subject
+        end
+      end
+
+      factory.configure_builder(:struct, schema_concern_dsl) do
+        def prop(name, &block)
+          name = name.to_sym
+          subject[:properties][name] = {}
+
+          build(subject, builder: :property, name: name, &block)
+        end
+      end
+
+      factory.configure_builder(:array, schema_concern_dsl) do
+        def item(&block)
+          build(subject[:item], &block)
+        end
+
+        private
+
+        def _schema
+          subject[:item]
+        end
+      end
+
+      factory.configure_builder(:property, schema_concern_dsl) do
+        def required
+          (subject[:required] ||= []) << options[:name]
+        end
+
+        private
+
+        def _schema
+          subject[:properties][options[:name]]
+        end
+      end
     end
 
     context 'when simple struct defined' do

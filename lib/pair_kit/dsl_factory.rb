@@ -20,8 +20,8 @@ module PairKit
       self
     end
 
-    def build(thing, builder_name = nil, **options, &block)
-      builder_name = builder_name&.to_sym || @default_builder
+    def build(thing, **options, &block)
+      builder_name = options[:builder] || @default_builder
       builder_class = builders[builder_name] || raise("Unknown builder #{builder_name}")
 
       Wrapper.new(builder_name, builder_class.new(self, thing, **options))
