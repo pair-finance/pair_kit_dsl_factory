@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 module World
   def world; end
 end

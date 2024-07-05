@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe PairKit::DslFactory do
   describe '#build' do
     let(:factory) { described_class.new }

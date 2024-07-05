@@ -1,6 +1,3 @@
-require 'spec_helper'
-
-
 describe PairKit::DslFactory do
   describe '#branch' do
     context 'when two methods defined for the same builder' do

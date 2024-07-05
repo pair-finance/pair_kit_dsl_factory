@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# require 'debug/start'
 require 'simplecov'
 
 SimpleCov.start do
