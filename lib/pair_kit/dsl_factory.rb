@@ -3,6 +3,7 @@ module PairKit
     require_relative 'dsl_factory/version'
     require_relative 'dsl_factory/builder'
     require_relative 'dsl_factory/wrapper'
+    require_relative 'dsl_factory/context_dsl'
 
     attr_reader :builders
 
@@ -20,18 +21,9 @@ module PairKit
       self
     end
 
-    def build(thing, **options, &block)
-      call(thing, **options, &block)
+    def build(thing, context = nil, **options, &block)
+      ContextDsl.new(self, context).call(thing, **options, &block)
       thing
-    end
-
-    def call(thing, **options, &block)
-      builder_name = (options[:builder] = options[:builder]&.to_sym || default_builder)
-
-      builder_class = builders[builder_name] || raise("Unknown builder #{builder_name}")
-
-      Wrapper.new(builder_name, builder_class.new(self, thing, **options))
-             .tap { |x| x.instance_exec(&block) if block }
     end
 
     def default_builder

@@ -8,14 +8,14 @@ end
 
 describe PairKit::DslFactory do
   describe '#configure_builder' do
-    subject { factory.({}) }
+    subject { factory.builders[:foo] }
 
     let(:factory) { described_class.new }
 
     context 'when builder method defined' do
       before { factory.configure_builder(:foo) { def hello; end } }
 
-      it { is_expected.to respond_to(:hello) }
+      it { is_expected.to have_instance_method(:hello) }
     end
 
     context 'when two builder methods defined together' do
@@ -26,8 +26,8 @@ describe PairKit::DslFactory do
         end
       end
 
-      it { is_expected.to respond_to(:hello) }
-      it { is_expected.to respond_to(:hello2) }
+      it { is_expected.to have_instance_method(:hello) }
+      it { is_expected.to have_instance_method(:hello2) }
     end
 
     context 'when two builder methods defined consecutively' do
@@ -36,14 +36,14 @@ describe PairKit::DslFactory do
         factory.configure_builder(:foo) { def hello2; end }
       end
 
-      it { is_expected.to respond_to(:hello) }
-      it { is_expected.to respond_to(:hello2) }
+      it { is_expected.to have_instance_method(:hello) }
+      it { is_expected.to have_instance_method(:hello2) }
     end
 
     context 'when a module included' do
       before { factory.configure_builder(:foo) { include World } }
 
-      it { is_expected.to respond_to(:world) }
+      it { is_expected.to have_instance_method(:world) }
     end
 
     context 'when two modules included together' do
@@ -54,8 +54,8 @@ describe PairKit::DslFactory do
         end
       end
 
-      it { is_expected.to respond_to(:world) }
-      it { is_expected.to respond_to(:world2) }
+      it { is_expected.to have_instance_method(:world) }
+      it { is_expected.to have_instance_method(:world2) }
     end
 
     context 'when two modules included consecutively' do
@@ -64,8 +64,8 @@ describe PairKit::DslFactory do
         factory.configure_builder(:foo) { include World2 }
       end
 
-      it { is_expected.to respond_to(:world) }
-      it { is_expected.to respond_to(:world2) }
+      it { is_expected.to have_instance_method(:world) }
+      it { is_expected.to have_instance_method(:world2) }
     end
 
     context 'when two modules passed as params' do
@@ -73,8 +73,8 @@ describe PairKit::DslFactory do
         factory.configure_builder(:foo, World, World2)
       end
 
-      it { is_expected.to respond_to(:world) }
-      it { is_expected.to respond_to(:world2) }
+      it { is_expected.to have_instance_method(:world) }
+      it { is_expected.to have_instance_method(:world2) }
     end
 
     context 'when one module passed, another included and method defined' do
@@ -85,9 +85,9 @@ describe PairKit::DslFactory do
         end
       end
 
-      it { is_expected.to respond_to(:world) }
-      it { is_expected.to respond_to(:world2) }
-      it { is_expected.to respond_to(:hello) }
+      it { is_expected.to have_instance_method(:world) }
+      it { is_expected.to have_instance_method(:world2) }
+      it { is_expected.to have_instance_method(:hello) }
     end
 
     context 'when two modules passed in a deep array' do
@@ -95,8 +95,8 @@ describe PairKit::DslFactory do
         factory.configure_builder(:foo, [World, [World2]])
       end
 
-      it { is_expected.to respond_to(:world) }
-      it { is_expected.to respond_to(:world2) }
+      it { is_expected.to have_instance_method(:world) }
+      it { is_expected.to have_instance_method(:world2) }
     end
   end
 end

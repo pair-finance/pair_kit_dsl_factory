@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+
+
 require 'simplecov'
 
 SimpleCov.start do
@@ -15,7 +17,7 @@ end
 
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].sort.each { |f| require f }
 
+require 'pair_kit/dsl_factory'
+
 require 'pry-byebug'
 require 'pry-alias'
-
-require 'pair_kit/dsl_factory'
